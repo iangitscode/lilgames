@@ -68,6 +68,14 @@
       ballx += ballvx;
       bally += ballvy;
 
+      if (ballx < block_width && bally >= lp && bally <= lp + block_height) {
+        ballvx *= -1;
+      } 
+
+      if (ballx > width - block_width && bally >= rp && bally <= rp + block_height) {
+        ballvx *= -1;
+      }
+
       if (ballx < 0) {
         rs++;
         restartBall();
@@ -88,14 +96,6 @@
       if (bally > height) {
         bally = height;
         ballvy *= -1;
-      }
-
-      if (ballx < block_width && bally >= lp && bally <= lp + block_height) {
-        ballvx *= -1;
-      } 
-
-      if (ballx > width - block_width && bally >= rp && bally <= rp + block_height) {
-        ballvx *= -1;
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
