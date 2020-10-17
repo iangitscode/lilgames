@@ -1,0 +1,138 @@
+<html>
+  <body>
+    <div class="scoreboard">
+      <div class="score">0</div>
+      |
+      <div class="score">0</div>
+    </div>
+    <canvas id="canvas" width="1000" height="500"></canvas>
+  </body>
+
+  <script>
+    const width = 1000;
+    const height = 500;
+    const block_width = 10;
+    const block_height = 100;
+    const jump = 10;
+
+    let canvas = document.querySelector("#canvas");
+    let ctx = canvas.getContext("2d");
+
+    let lp = 0;
+    let rp = 0;
+
+    const ballrad = 10;
+
+    let ballx, bally, ballvx, ballvy;
+    const restartBall = () => {
+      ballx = (width + ballrad) / 2;
+      bally = (height + ballrad) / 2;
+
+      ballvx = (Math.random() * 8 + 8) * (Math.random() > 0.5 ? -1 : 1)
+      ballvy = (Math.random() * 8 + 6) * (Math.random() > 0.5 ? -1 : 1)
+    }
+
+    const drawScore = () => {
+      const scores = document.getElementsByClassName("score");
+      scores[0].innerText = ls;
+      scores[1].innerText = rs;
+    }
+
+    let ls = 0;
+    let rs = 0;
+
+    restartBall();
+
+    let downs = new Set;
+    document.addEventListener("keydown", (key) => {
+      downs.add(key.keyCode)
+    });
+    document.addEventListener("keyup", (key) => {
+      downs.delete(key.keyCode)
+    });
+
+    const tick = () => {
+      if (downs.has(81) && lp > jump) {
+        lp -= jump;
+      }
+      if (downs.has(90) && lp < height - block_height - jump) {
+        lp += jump;
+      }
+      if (downs.has(38) && rp > jump) {
+        rp -= jump;
+      }
+      if (downs.has(40) && rp < height - block_height - jump) {
+        rp += jump;
+      }
+
+      ballx += ballvx;
+      bally += ballvy;
+
+      if (ballx < 0) {
+        rs++;
+        restartBall();
+        drawScore();
+      }
+
+      if (ballx > width) {
+        ls++;
+        restartBall();
+        drawScore();
+      }
+
+      if (bally < 0) {
+        bally = 0;
+        ballvy *= -1;
+      }
+      
+      if (bally > height) {
+        bally = height;
+        ballvy *= -1;
+      }
+
+      if (ballx < block_width && bally >= lp && bally <= lp + block_height) {
+        ballvx *= -1;
+      } 
+
+      if (ballx > width - block_width && bally >= rp && bally <= rp + block_height) {
+        ballvx *= -1;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.beginPath();
+      ctx.rect(0, lp, block_width, block_height);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.rect(width - block_width, rp, block_width, block_height);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(ballx, bally, ballrad, 0, 2 * Math.PI);
+      ctx.fill();
+    };
+
+    setInterval(tick, 1000/30);
+
+  </script>
+
+  <style>
+    #canvas {
+      border: 1px solid black;
+    }
+    .scoreboard {
+      display: flex;
+      font-size: 10em;
+    }
+    .score {
+      transform: translateY(6%);
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  </style>
+</html>
