@@ -1,0 +1,173 @@
+<html>
+  <html>
+  <body>
+    <div class="score"></div>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <div class="instructions">
+      Use the arrow keys to move!
+    </div>
+  </body>
+
+  <script>
+    const directions = {
+      UP: "up",
+      DOWN: "down",
+      LEFT: "left",
+      RIGHT: "right"
+    }
+
+    const width = 1000;
+    const height = 1000;
+
+    const canvas = document.querySelector("#canvas");
+    const ctx = canvas.getContext("2d");
+
+    const squareHeight = 50;
+
+    let headx, heady, foodx, foody, tails, direction;
+
+    let gameStopped = true;
+    document.querySelector(".score").innerText = 0;
+
+    const resetFood = () => {
+      foodx = Math.floor(Math.random() * width/squareHeight);
+      foody = Math.floor(Math.random() * height/squareHeight);
+      while (foodx == headx && foody == heady) {
+        resetFood();
+      }
+    };
+
+    const startGame= () => {
+      headx = 10;
+      heady = 10;
+      direction = directions.UP;
+      tails = [];
+      resetFood();
+    }
+
+    const rect = (x, y, width, height, color) => {
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.rect(x, y, width, height);
+      ctx.fill();
+    };
+
+    const square = (x, y, color = "black") => {
+      rect(x * squareHeight, y * squareHeight, squareHeight, squareHeight, color);
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      square(headx, heady, "#257d40");
+      for (let tail of tails) {
+        square(tail.x, tail.y, "#37b05b");
+      }
+
+      ctx.beginPath();
+      const rad = squareHeight / 2 - 10;
+      ctx.fillStyle = "#995146";
+      ctx.arc(rad * 2 + foodx * squareHeight, rad * 2 + foody * squareHeight, rad, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    document.addEventListener("keydown", (key) => {
+      gameStopped = false;
+      switch (key.keyCode) {
+        case 37:
+          direction = directions.LEFT;
+          break;
+        case 38: 
+          direction = directions.UP;
+          break;
+        case 39:
+          direction = directions.RIGHT;
+          break;
+        case 40:
+          direction = directions.DOWN;
+          break;
+      }
+    });
+
+    const tick = () => {
+      draw();
+      if (gameStopped) return;
+      document.querySelector(".score").innerText = tails.length;
+      tails.push({"x": headx, "y": heady});
+      switch (direction) {
+        case directions.UP:
+          if (heady == 0) {
+            die();
+            return;
+          }
+          heady--;
+          break;
+        case directions.DOWN:
+          if (heady == height/squareHeight) {
+            die();
+            return;
+          }
+          heady++;
+          break;
+        case directions.LEFT:
+          if (headx == 0) {
+            die();
+            return;
+          }
+          headx--;
+          break;
+        case directions.RIGHT:
+          if (headx == width/squareHeight) {
+            die();
+            return;
+          }
+          headx++;
+          break;
+      }
+
+      tails.shift();
+
+      for (let tail of tails) {
+        if (headx == tail.x && heady == tail.y) {
+          die();
+          return;
+        }
+      }
+
+      if (headx == foodx && heady == foody) {
+        if (tails.length > 0) tails.unshift(tails.slice(-1)[0]);
+        else tails.unshift({"x": headx, "y": heady});
+        resetFood();
+      }
+    };
+
+    startGame();
+
+    setInterval(tick, 1000/10);
+
+    const die = () => {
+      gameStopped = true;
+      startGame();
+    };
+
+  </script>
+
+  <style>
+    #canvas {
+      border: 1px solid black;
+    }
+    .score {
+      font-size: 10em;
+    }
+    .instructions {
+      font-size: 2em;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  </style>
+</html>
+</html>
