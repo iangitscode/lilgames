@@ -2,7 +2,7 @@
   <html>
   <body>
     <div class="score"></div>
-    <canvas id="canvas" width="1000" height="1000"></canvas>
+    <canvas id="canvas" width="500" height="500"></canvas>
     <div class="instructions">
       Use the arrow keys to move!
     </div>
@@ -16,13 +16,13 @@
       RIGHT: "right"
     }
 
-    const width = 1000;
-    const height = 1000;
+    const width = 500;
+    const height = 500;
 
     const canvas = document.querySelector("#canvas");
     const ctx = canvas.getContext("2d");
 
-    const squareHeight = 50;
+    const squareHeight = 25;
 
     let headx, heady, foodx, foody, tails, direction;
 
@@ -40,7 +40,6 @@
     const startGame= () => {
       headx = 10;
       heady = 10;
-      direction = directions.UP;
       tails = [];
       resetFood();
     }
@@ -65,9 +64,9 @@
       }
 
       ctx.beginPath();
-      const rad = squareHeight / 2 - 10;
+      const rad = squareHeight / 2;
       ctx.fillStyle = "#995146";
-      ctx.arc(rad * 2 + foodx * squareHeight, rad * 2 + foody * squareHeight, rad, 0, 2 * Math.PI);
+      ctx.arc(rad + foodx * squareHeight, rad + foody * squareHeight, rad, 0, 2 * Math.PI);
       ctx.fill();
     }
 
@@ -75,16 +74,16 @@
       gameStopped = false;
       switch (key.keyCode) {
         case 37:
-          direction = directions.LEFT;
+          if (direction != directions.RIGHT) direction = directions.LEFT;
           break;
         case 38: 
-          direction = directions.UP;
+          if (direction != directions.DOWN) direction = directions.UP;
           break;
         case 39:
-          direction = directions.RIGHT;
+          if (direction != directions.LEFT) direction = directions.RIGHT;
           break;
         case 40:
-          direction = directions.DOWN;
+          if (direction != directions.UP) direction = directions.DOWN;
           break;
       }
     });
